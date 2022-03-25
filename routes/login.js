@@ -1,16 +1,22 @@
 const jwt = require("jsonwebtoken");
 const _ = require("lodash");
-const Registration = require("../model/Doctor");
-const Registration = require("../model/Patient");
+const Doctor = require("../model/Doctor");
+const Patient = require("../model/Patient");
 require('../services/doctorPassport');
 require('../services/patientPassport');
 const bcrypt = require("bcrypt");
 const express = require("express");
 const router = express();
 
-// @desc    Forgot password link
-// @route   POST /api/login
-router.post("/", async (req, res) => {
+
+// @Route to Login Page
+router.get('/page login', (req, res) => {
+  res.sendFile(__dirname + '/static/page login.html');
+});
+
+// @route   POST /routes/login/doctor
+
+router.post("/doctor", async (req, res) => {
   const { error } = req.body;
   const { email, password } = req.body;
   console.log("doctor");
@@ -40,8 +46,14 @@ router.post("/", async (req, res) => {
   }
 });
 
-// @desc    Forgot password link
-// @route   POST /api/login
+
+// Route to Login Page
+router.get('/page login', (req, res) => {
+  res.sendFile(__dirname + '/static/page login.html');
+});
+
+// @route   POST /routes/login/patient
+
 router.post("/", async (req, res) => {
   const { error } = req.body;
   const { email, password } = req.body;
@@ -51,7 +63,7 @@ router.post("/", async (req, res) => {
     console.log(email, password);
     const patient = await Patient.findOne({ email });
     if (patient) {
-      const validpassword = await bcrypt.compare(password, user.newPassword);
+      const validpassword = await bcrypt.compare(password, patient.newPassword);
 
       console.log(validpassword);
 

@@ -18,10 +18,10 @@ router.post('/resend/doctor', async (req, res) => {
       if(err) { return res.status(400).send({ msg: err.message }); }
       const transporter = nodemailer.createTransport({ 
         service: 'gmail', auth: { user: process.env.AUTH_EMAIL, pass: process.env.AUTH_PASS } });
-      const mailOptions = { from: 'no-reply@codemoto.io', to: user.email, subject: 'Account Verification Token', text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '.\n' };
+      const mailOptions = { from: process.env.AUTH_EMAIL, to: doctor.email, subject: 'Account Verification Token', text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '.\n' };
       transport.sendMail(mailOptions, function (err) {
         if (err) { return res.status(400).send({ msg: err.message }); }
-        res.status(200).send('A verification email has been sent to ' + user.email + '.');
+        res.status(200).send('A verification email has been sent to ' + doctor.email + '.');
       });
     });
   });
@@ -39,10 +39,10 @@ router.post('/resend/patient', async (req, res) => {
     token.save(function (err) {
       if(err) { return res.status(400).send({ msg: err.message }); }
       const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: process.env.AUTH_EMAIL, pass: process.env.AUTH_PASS } });
-      const mailOptions = { from: 'no-reply@codemoto.io', to: user.email, subject: 'Account Verification Token', text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '.\n' };
+      const mailOptions = { from: process.env.AUTH_EMAIL, to: patient.email, subject: 'Account Verification Token', text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '.\n' };
       transport.sendMail(mailOptions, function (err) {
         if (err) { return res.status(400).send({ msg: err.message }); }
-        res.status(200).send('A verification email has been sent to ' + user.email + '.');
+        res.status(200).send('A verification email has been sent to ' + patient.email + '.');
       });
     });
   });
