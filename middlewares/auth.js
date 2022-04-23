@@ -1,7 +1,7 @@
 const jwt =require('jsonwebtoken')
 const asyncHandler =require( 'express-async-handler')
-const Doctor =require('../model/Doctor')
-const Patient = require('../model/Patient')
+const Doctor =require('../model/doctor')
+const Patient = require('../model/patient')
 
 
 const protect = asyncHandler(async (req, res, next) => {
@@ -16,7 +16,7 @@ const protect = asyncHandler(async (req, res, next) => {
 
       const decoded = jwt.verify(token, "jwtPrivateKey")
 
-      req.patient = await Patient.findById(decoded.id).select('-newPassword')
+      req.patient = await Patient.findById(decoded.id).select('-password')
 
       next()
     } catch (error) {
@@ -35,7 +35,7 @@ const protect = asyncHandler(async (req, res, next) => {
 
       const decoded = jwt.verify(token, "jwtPrivateKey")
 
-      req.patient = await Patient.findById(decoded.id).select('-newPassword')
+      req.patient = await Patient.findById(decoded.id).select('-password')
 
       next()
     } catch (error) {

@@ -1,6 +1,8 @@
 const Token = require("../model/Token");
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const Doctor = require('../model/doctor');
+const Patient = require('../model/patient');
 const mongoose = require('mongoose');
 const express = require('express');
 const router = express();
@@ -31,7 +33,7 @@ router.post('/resend/patient', async (req, res) => {
   const errors = req.validationErrors();
   if (errors) return res.status(400).send(error);
 
-  User.findOne({email: req.body.email}, function (err, user) {
+  Patient.findOne({email: req.body.email}, function (err, user) {
     if (!patient) return res.status(400).send({ msg: 'Could not find patient with that email.' });
     if (patient.isVerified) return res.status(400).send({ msg: 'Account verified. log in.' });
     const token = new Token({ _patientId: patient._id, token: crypto.randomBytes(16).toString('hex') });

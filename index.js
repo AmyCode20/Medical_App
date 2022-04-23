@@ -2,48 +2,36 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cookieSession = require('cookie-session');
 const passport = require('passport');
+const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const expressLayouts = require('express-ejs-layouts');
 const cors = require('cors');
-const Doctor = require('./model/Doctor');
-const Patient = require('./model/Patient');
+const Doctor = require('./model/doctor');
+const Patient = require('./model/patient');
+const Admin = require('./model/admin');
 const Token = require('./model/Token');
-const doctorRoutes = require('./routes/doctorRoutes');
-const patientRoutes = require('./routes/patientRoutes');
-const login = require('./routes/login')
 const verify = require('./routes/verify');
-const resend = require('./routes/resend')
-require('./services/doctorPassport');
-require('./services/patientPassport');
-require('dotenv').config();
+const resend = require('./routes/resend');
+const routes = require ('./routes/index');
+const path = require('path');
+require('dotenv').config(); 
 require("./config/db");
 
 const app = express();  
 app.use(cors());
 //express body parser
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
+app.set('view engine', 'ejs');
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 app.use(cookieParser());
 
-app.use(
-  cookieSession({
-    maxAge: 30 * 24 * 60 * 60 * 1000,
-    keys: [process.env.COOKEY_KEY]
-  })
-);
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(expressLayouts);
+app.set('layout', './layout/main');
 
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(routes)
 
-app.use("/routes/doctorRoutes", doctorRoutes);
-app.use("/routes/patientRoutes", patientRoutes);
-app.use("/routes/login", login)
-
-
-
-app.get("/", async (req, res) => {
-  res.send("index");
-});
 
 const PORT = process.env.PORT || 5000
 

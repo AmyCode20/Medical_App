@@ -1,22 +1,60 @@
-const mongoose = require('mongoose');
-const schema = mongoose.Schema();
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+var bcrypt = require('bcrypt');
 
-const PatientSchema = new mongoose.Schema(
-  {
-  googleId: String,
-  name: {type: String, required: true, minlength: 3, maxlength: 50},
-  email: {type: String, required: true, minlength: 5, maxlength: 255, unique: true},
-  date : { type : Date, default: Date.now},
-  isVerified: {type: Boolean, default: false},
-  subscription: {type: Boolean, default: false},
-  chat: {type: Boolean, default: false},
-  audioCall: {type: Boolean, default: false},
-  videoCall: {type: Boolean, default:false},
-  newPassword: {type: String, required: true, minlength: 5, maxlength: 1024},
-  isAdmin: { type: Boolean },
-},
-  {collection: 'patients'}
-);
 
-const Model = mongoose.model('Patient', PatientSchema);
-module.exports = Model;
+var patientSchema = new Schema({
+    name: {
+        type: String,
+        require: true
+    },
+    email: {
+        type: String,
+        require: true,
+        minlength: 5, maxlength: 255, unique: true
+    },
+    password: {
+        type: String,
+        require: true
+    }
+})
+
+patientSchema.pre('save', function (next) {
+    var patient = this;
+    if (this.isModified('password') || this.isNew) {
+        bcrypt.genSalt(10, function (err, salt) {
+            if (err) {
+                return next(err)
+            }
+            bcrypt.hash(patient.password, salt, function (err, hash) {
+                if (err) {
+                    return next(err)
+                }
+                patient.password = hash;
+                next()
+            })
+        })
+    }
+    else {
+        return next()
+    }
+})
+
+patientSchema.methods.comparePassword = function (pass, cb) {
+    bcrypt.compare(pass, this.password, function (err, isMatch) {
+        if(err) {
+            return cb(err)
+        }
+        cb(null, isMatch)
+    })
+}
+
+patientSchema.fetchData = function(callback) {
+    data = Model.find({});
+    data.exec(function(err , data){
+      if(err) throw err;
+      return callback(data);
+    })
+}
+
+module.exports = mongoose.model('Patient', patientSchema); 
